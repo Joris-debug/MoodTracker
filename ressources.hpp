@@ -1,6 +1,3 @@
-const int SCREEN_WIDTH = 128;
-const int SCREEN_HEIGHT = 160;
-
 #define SMILEY_HEIGHT 160
 #define SMILEY_WIDTH 128
 

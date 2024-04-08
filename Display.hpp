@@ -5,8 +5,13 @@
 #include <SPI.h>
 
 class Display : public Adafruit_ST7735 {
+  private:
+    uint16_t* m_p_frameBuffer;
+    uint m_bufferLenght;
   public:
     Display(uint8_t cs, uint8_t dc, uint8_t rst);
     void drawImage(const uint16_t* source, int x, int y, int w, int h);
     void drawImage(const uint16_t* source, int x, int y, int w, int h, uint16_t chromaKey);
+    void renderBuffer(void);
+    ~Display();
 };

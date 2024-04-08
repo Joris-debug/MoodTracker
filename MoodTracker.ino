@@ -99,21 +99,21 @@ void drawMenu(void) {
     tft.fillScreen(ST77XX_BLACK);
     switch(selected) {  //Draws the rectangle around the selection
       case 1:
-        tft.drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT * 0.33, ST77XX_WHITE);
+        tft.drawRect(0, 0, ST7735_TFTWIDTH_128, ST7735_TFTHEIGHT_160 * 0.33, ST77XX_WHITE);
         break;
       case 2:
-        tft.drawRect(0, SCREEN_HEIGHT * 0.33, SCREEN_WIDTH, SCREEN_HEIGHT * 0.33, ST77XX_WHITE);
+        tft.drawRect(0, ST7735_TFTHEIGHT_160 * 0.33, ST7735_TFTWIDTH_128, ST7735_TFTHEIGHT_160 * 0.33, ST77XX_WHITE);
         break;
       case 3:
-        tft.drawRect(0, SCREEN_HEIGHT * 0.66, SCREEN_WIDTH, SCREEN_HEIGHT * 0.33, ST77XX_WHITE);
+        tft.drawRect(0, ST7735_TFTHEIGHT_160 * 0.66, ST7735_TFTWIDTH_128, ST7735_TFTHEIGHT_160 * 0.33, ST77XX_WHITE);
         break;
     }
     char tmpText[11] = "AutoByte";
-    drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.165, ST77XX_WHITE, 2);
+    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.165, ST77XX_WHITE, 2);
     strcpy(tmpText, "Abstimmen");
-    drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.5, ST77XX_WHITE, 2);
+    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.5, ST77XX_WHITE, 2);
     strcpy(tmpText, "Ergebnisse");
-    drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.825, ST77XX_WHITE, 2);
+    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.825, ST77XX_WHITE, 2);
   }
 }
 
@@ -163,22 +163,22 @@ void drawVoteMenu(void) {
         break;
     }    
     char tmpText[14] = "Wie geht";
-    drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.8, ST77XX_WHITE, 2);
+    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.8, ST77XX_WHITE, 2);
     strcpy(tmpText, "es dir?");
-    drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.92, ST77XX_WHITE, 2);
+    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.92, ST77XX_WHITE, 2);
   }
 }
 
 void drawVoteSuccess(void) {
   tft.fillScreen(ST77XX_BLACK);
   char tmpText[14] = "Du hast";
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.18, ST77XX_WHITE, 2);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.18, ST77XX_WHITE, 2);
   strcpy(tmpText, "mit Erfolg");
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.35, ST77XX_WHITE, 2);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.35, ST77XX_WHITE, 2);
   strcpy(tmpText, "abgestimmt");
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.51, ST77XX_WHITE, 2);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.51, ST77XX_WHITE, 2);
 
-  tft.drawImage(checkmark, (SCREEN_WIDTH - CHECKMARK_WIDTH) * 0.5, SCREEN_HEIGHT * 0.65, CHECKMARK_WIDTH, CHECKMARK_HEIGHT, 0x0000);
+  tft.drawImage(checkmark, (ST7735_TFTWIDTH_128 - CHECKMARK_WIDTH) * 0.5, ST7735_TFTHEIGHT_160 * 0.65, CHECKMARK_WIDTH, CHECKMARK_HEIGHT, 0x0000);
   waitForAction();
 }
 
@@ -213,17 +213,17 @@ void drawVoteResults(void) {
       dayCount++;
     }
     if(i != ROWS) { //Dont draw a divider for the last row
-      tft.drawLine(X_OFFSET, Y_OFFSET + (SQUARE_WIDTH + 1) * (i + 1), SCREEN_WIDTH - X_OFFSET, Y_OFFSET + (SQUARE_WIDTH + 1) * (i + 1), ST77XX_BLACK);
+      tft.drawLine(X_OFFSET, Y_OFFSET + (SQUARE_WIDTH + 1) * (i + 1), ST7735_TFTWIDTH_128 - X_OFFSET, Y_OFFSET + (SQUARE_WIDTH + 1) * (i + 1), ST77XX_BLACK);
     }
   }  
   char tmpText[] = "Hier siehst du";
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.65, ST77XX_WHITE, 1);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.65, ST77XX_WHITE, 1);
   strcpy(tmpText, "die Ergebnisse");
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.75, ST77XX_WHITE, 1);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.75, ST77XX_WHITE, 1);
   strcpy(tmpText, "der letzten");
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.85, ST77XX_WHITE, 1);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.85, ST77XX_WHITE, 1);
   strcpy(tmpText, "30 Tage");
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.95, ST77XX_WHITE, 1);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.95, ST77XX_WHITE, 1);
   waitForAction();
 }
 
@@ -258,13 +258,13 @@ void drawMoodAverage(void) {
   color = static_cast<uint16_t>((red << 11) | (green << 5) | blue);
   tft.fillScreen(color);
   char tmpText[] = "Im Schnitt";
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.26, ST77XX_BLACK, 2);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.26, ST77XX_BLACK, 2);
   strcpy(tmpText, "war das");
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.42, ST77XX_BLACK, 2);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.42, ST77XX_BLACK, 2);
   strcpy(tmpText, "deine");
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.58, ST77XX_BLACK, 2);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.58, ST77XX_BLACK, 2);
   strcpy(tmpText, "Stimmung");
-  drawText(tmpText, SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.76, ST77XX_BLACK, 2);
+  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.76, ST77XX_BLACK, 2);
   waitForAction();
 }
 

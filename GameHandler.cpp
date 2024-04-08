@@ -1,5 +1,4 @@
 #include "GameHandler.hpp"
-#include "ressources.hpp"
 
 GameHandler* GameHandler::s_instance = nullptr;
 const float GameHandler::CAR_SPEED = 0.05;
@@ -7,7 +6,7 @@ const float GameHandler::CAR_SPEED = 0.05;
 GameHandler::GameHandler(void) {
   m_p_tft = nullptr;
   m_p_pot = nullptr;
-  m_carPos = SCREEN_WIDTH * 0.5;
+  m_carPos = ST7735_TFTWIDTH_128 * 0.5;
 }
 
 void GameHandler::init(Display* p_tft, Regulator* p_pot) {
@@ -40,12 +39,12 @@ void GameHandler::run(void) {
 }
 
 void GameHandler::drawStreet(void) {
-  m_p_tft->drawLine(STREET_OFFSET_FAR, 0, 0, SCREEN_HEIGHT, ST77XX_BLACK);
-  m_p_tft->drawLine(SCREEN_WIDTH - STREET_OFFSET_FAR, 0, SCREEN_WIDTH, SCREEN_HEIGHT, ST77XX_BLACK);
+  m_p_tft->drawLine(STREET_OFFSET_FAR, 0, 0, ST7735_TFTHEIGHT_160, ST77XX_BLACK);
+  m_p_tft->drawLine(ST7735_TFTWIDTH_128 - STREET_OFFSET_FAR, 0, ST7735_TFTWIDTH_128, ST7735_TFTHEIGHT_160, ST77XX_BLACK);
 }
 
 void GameHandler::drawCar(void) {
-  m_p_tft->drawImage(car, m_carPos - 0.5 * CAR_WIDTH, SCREEN_HEIGHT - CAR_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ST77XX_GREEN);
+  m_p_tft->drawImage(car, m_carPos - 0.5 * CAR_WIDTH, ST7735_TFTHEIGHT_160 - CAR_HEIGHT, CAR_WIDTH, CAR_HEIGHT, ST77XX_GREEN);
 }
 
 void GameHandler::moveCar(unsigned long deltaTime) {
@@ -63,8 +62,8 @@ void GameHandler::moveCar(unsigned long deltaTime) {
 
   if(m_carPos < 0.5 * CAR_WIDTH) {
     m_carPos = 0.5 * CAR_WIDTH;
-  } else if(m_carPos > SCREEN_WIDTH - 0.5 * CAR_WIDTH) {
-    m_carPos = SCREEN_WIDTH - 0.5 * CAR_WIDTH;
+  } else if(m_carPos > ST7735_TFTWIDTH_128 - 0.5 * CAR_WIDTH) {
+    m_carPos = ST7735_TFTWIDTH_128 - 0.5 * CAR_WIDTH;
   }
 }
 
