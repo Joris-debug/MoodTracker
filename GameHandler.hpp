@@ -7,7 +7,7 @@ class GameHandler {
   private:
     const static int STREET_OFFSET_FAR = 52;
     const static float CAR_SPEED;
-    const static int FPS = 3;
+    const static int FPS = 30;
     static GameHandler* s_instance;
     Display* m_p_tft;
     Regulator* m_p_pot;

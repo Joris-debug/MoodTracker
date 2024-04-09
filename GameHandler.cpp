@@ -1,4 +1,5 @@
 #include "GameHandler.hpp"
+#include "ressources.hpp"
 
 GameHandler* GameHandler::s_instance = nullptr;
 const float GameHandler::CAR_SPEED = 0.05;
@@ -29,6 +30,7 @@ void GameHandler::run(void) {
     drawStreet();
     moveCar(deltaTime);
     drawCar();
+    m_p_tft->renderBuffer();
     lastTime = millis();
     deltaTime = millis() - lastTime;  //Milliseconds that have passed since the last cycle of the game loop
     if(deltaTime < 1000 / FPS) {

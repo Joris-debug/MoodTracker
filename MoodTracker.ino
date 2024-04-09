@@ -43,11 +43,6 @@ Preferences prefs;
 
 enum Mood { Happy = 1, Neutral = 2, Sad = 3 };
 
-struct Point {
-  int x;
-  int y;
-};
-
 void setup(void) {
   pinMode(APP_BUZZ, OUTPUT);
   Serial.begin(9600);
@@ -109,11 +104,12 @@ void drawMenu(void) {
         break;
     }
     char tmpText[11] = "AutoByte";
-    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.165, ST77XX_WHITE, 2);
+    tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.165, ST77XX_WHITE, 2);
     strcpy(tmpText, "Abstimmen");
-    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.5, ST77XX_WHITE, 2);
+    tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.5, ST77XX_WHITE, 2);
     strcpy(tmpText, "Ergebnisse");
-    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.825, ST77XX_WHITE, 2);
+    tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.825, ST77XX_WHITE, 2);
+    tft.renderBuffer();
   }
 }
 
@@ -163,22 +159,24 @@ void drawVoteMenu(void) {
         break;
     }    
     char tmpText[14] = "Wie geht";
-    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.8, ST77XX_WHITE, 2);
+    tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.8, ST77XX_WHITE, 2);
     strcpy(tmpText, "es dir?");
-    drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.92, ST77XX_WHITE, 2);
+    tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.92, ST77XX_WHITE, 2);
+    tft.renderBuffer();
   }
 }
 
 void drawVoteSuccess(void) {
   tft.fillScreen(ST77XX_BLACK);
   char tmpText[14] = "Du hast";
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.18, ST77XX_WHITE, 2);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.18, ST77XX_WHITE, 2);
   strcpy(tmpText, "mit Erfolg");
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.35, ST77XX_WHITE, 2);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.35, ST77XX_WHITE, 2);
   strcpy(tmpText, "abgestimmt");
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.51, ST77XX_WHITE, 2);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.51, ST77XX_WHITE, 2);
 
   tft.drawImage(checkmark, (ST7735_TFTWIDTH_128 - CHECKMARK_WIDTH) * 0.5, ST7735_TFTHEIGHT_160 * 0.65, CHECKMARK_WIDTH, CHECKMARK_HEIGHT, 0x0000);
+  tft.renderBuffer();
   waitForAction();
 }
 
@@ -217,13 +215,14 @@ void drawVoteResults(void) {
     }
   }  
   char tmpText[] = "Hier siehst du";
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.65, ST77XX_WHITE, 1);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.65, ST77XX_WHITE, 1);
   strcpy(tmpText, "die Ergebnisse");
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.75, ST77XX_WHITE, 1);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.75, ST77XX_WHITE, 1);
   strcpy(tmpText, "der letzten");
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.85, ST77XX_WHITE, 1);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.85, ST77XX_WHITE, 1);
   strcpy(tmpText, "30 Tage");
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.95, ST77XX_WHITE, 1);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.95, ST77XX_WHITE, 1);
+  tft.renderBuffer();
   waitForAction();
 }
 
@@ -258,49 +257,20 @@ void drawMoodAverage(void) {
   color = static_cast<uint16_t>((red << 11) | (green << 5) | blue);
   tft.fillScreen(color);
   char tmpText[] = "Im Schnitt";
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.26, ST77XX_BLACK, 2);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.26, ST77XX_BLACK, 2);
   strcpy(tmpText, "war das");
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.42, ST77XX_BLACK, 2);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.42, ST77XX_BLACK, 2);
   strcpy(tmpText, "deine");
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.58, ST77XX_BLACK, 2);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.58, ST77XX_BLACK, 2);
   strcpy(tmpText, "Stimmung");
-  drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.76, ST77XX_BLACK, 2);
+  tft.drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.76, ST77XX_BLACK, 2);
+  tft.renderBuffer(); 
   waitForAction();
-}
-
-void drawText(char *text, int x, int y, uint16_t color, int size) {
-  tft.setTextWrap(false);
-  tft.setTextSize(size);
-  Point newPos = centerText(text, x, y);
-  tft.setCursor(newPos.x, newPos.y);
-  tft.setTextColor(color);
-  tft.print(text);
-}
-
-Point centerText(char *text, int cursorX, int cursorY) {
-  int16_t x, y;
-  uint16_t w, h;
-  tft.getTextBounds(text, cursorX, cursorY, &x, &y, &w, &h);
-  Point newPos;
-  newPos.x = cursorX - 0.5 * w;
-  newPos.y = cursorY - 0.5 * h;
-  /*
-  Serial.print("Nachher:");
-  Serial.print(w);
-  Serial.print(":");
-  Serial.println(h);
-  */
-  return newPos;
 }
 
 byte* getVotes(void) {  
   static byte votes[VOTE_MEMORY];
   prefs.getBytes("votes", votes, VOTE_MEMORY);
-  /*
-  for(int i = 0; i < VOTE_MEMORY; i++) {
-    Serial.println(votes[i]);
-  }
-  */
   return votes;
 }
 
