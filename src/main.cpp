@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <Preferences.h>
 #include "ressources.hpp"
 #include "Regulator.hpp"
@@ -27,7 +28,20 @@
 #define NOTE_A5        880
 #define NOTE_B5        988
 
-const int           buttonDuration = 125; //How long the sound will play
+enum Mood { Happy = 1, Neutral = 2, Sad = 3 };
+
+void playSound(int note, int duration);
+void drawMenu(void);
+void drawSmiley(Mood mood);
+void drawVoteMenu(void);
+void drawVoteSuccess(void);
+void drawVoteResults(void);
+void addVote(Mood vote);
+void drawMoodAverage(void);
+void waitForAction(void);
+byte* getVotes(void);
+
+const int          buttonDuration = 125; //How long the sound will play
 const int               STREET_X1 = 60;
 const int               STREET_X2 = 68;
 const int             VOTE_MEMORY = 30;
@@ -40,8 +54,6 @@ Button but(APP_BUT);
 GameHandler game = GameHandler::getInstance();
 Display tft(TFT_CS, TFT_DC, TFT_RST);
 Preferences prefs;
-
-enum Mood { Happy = 1, Neutral = 2, Sad = 3 };
 
 void setup(void) {
   pinMode(APP_BUZZ, OUTPUT);
@@ -232,7 +244,8 @@ void drawMoodAverage(void) {
   uint blue = 0;
   uint16_t color = 0;
   byte* votes = getVotes();
-  for(int i = 0; i < VOTE_MEMORY; i++) {
+  uint8_t totalVotes = 0;
+  for(uint8_t i = 0; i < VOTE_MEMORY; i++) {
       switch(votes[i]) {
         case 1:
           color = APP_GREEN; 
@@ -244,16 +257,16 @@ void drawMoodAverage(void) {
           color = APP_RED;
           break;
         default:
-          color = 0x0000;
-          break;
+          continue;
       }
       red += (color & 0b1111100000000000) >> 11;  //The color has palette mode 565
       green += (color & 0b0000011111100000) >> 5;
       blue += color & 0b0000000000011111;
+      totalVotes++;
   }
-  red /= VOTE_MEMORY;
-  green /= VOTE_MEMORY;
-  blue /= VOTE_MEMORY;
+  red /= totalVotes;
+  green /= totalVotes;
+  blue /= totalVotes;
   color = static_cast<uint16_t>((red << 11) | (green << 5) | blue);
   tft.fillScreen(color);
   char tmpText[] = "Im Schnitt";

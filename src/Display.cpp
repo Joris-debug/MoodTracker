@@ -1,6 +1,15 @@
 #include "Display.hpp"
 #include "glcdfont.c"
 
+#ifndef _swap_int16_t
+#define _swap_int16_t(a, b)                                                    \
+  {                                                                            \
+    int16_t t = a;                                                             \
+    a = b;                                                                     \
+    b = t;                                                                     \
+  }
+#endif
+
 Display::Display(uint8_t cs, uint8_t dc, uint8_t rst) : Adafruit_ST7735(cs, dc, rst) {
   m_bufferLength = ST7735_TFTWIDTH_128 * ST7735_TFTHEIGHT_160;
   m_p_frameBuffer = new uint16_t[m_bufferLength] {0};
@@ -21,7 +30,7 @@ void Display::drawImage(const uint16_t* source, int x, int y, int w, int h) {
 void Display::drawImage(const uint16_t* source, int x, int y, int w, int h, uint16_t chromaKey) {
   int pixelCount = 0;
   for (int row = 0; row < h; row++) { // For each scanline...
-    for (int col = 0; col <w; col++) { // For each pixel...
+    for (int col = 0; col < w; col++) { // For each pixel...
       if(pgm_read_word(source + pixelCount) != chromaKey) {
         writePixel(x + col, y + row, pgm_read_word(source + pixelCount));
       }
@@ -33,17 +42,17 @@ void Display::drawImage(const uint16_t* source, int x, int y, int w, int h, uint
 void Display::drawText(char *text, int x, int y, uint16_t color, int size) {
   setTextWrap(false);
   setTextSize(size);
-  Point newPos = centerText(text, x, y);
+  Vector2D newPos = centerText(text, x, y);
   setCursor(newPos.x, newPos.y);
   setTextColor(color);
   print(text);
 }
 
-Point Display::centerText(char *text, int cursorX, int cursorY) {
+Vector2D Display::centerText(char *text, int cursorX, int cursorY) {
   int16_t x, y;
   uint16_t w, h;
   getTextBounds(text, cursorX, cursorY, &x, &y, &w, &h);
-  Point newPos;
+  Vector2D newPos;
   newPos.x = cursorX - 0.5 * w;
   newPos.y = cursorY - 0.5 * h;
   return newPos;
@@ -54,6 +63,13 @@ void Display::renderBuffer(void) {
   setAddrWindow(0, 0, ST7735_TFTWIDTH_128, ST7735_TFTHEIGHT_160);
   writePixels(m_p_frameBuffer, m_bufferLength);
   endWrite();
+}
+
+uint16_t Display::getPixel(int16_t x, int16_t y) {
+  if ((x >= 0) && (x < ST7735_TFTWIDTH_128) && (y >= 0) && (y < ST7735_TFTHEIGHT_160)) {
+    return m_p_frameBuffer[x + y * ST7735_TFTWIDTH_128];
+  }
+  return 0;
 }
 
 void Display::writePixel(int16_t x, int16_t y, uint16_t color) {
@@ -71,6 +87,22 @@ void Display::writeFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
 void Display::writeFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
   for(int i = 0; i < w; i++) {
     writePixel(x + i, y, color);
+  }
+}
+
+void Display::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color) {
+  if (x0 == x1) {
+    if (y0 > y1) {
+      _swap_int16_t(y0, y1);
+    }
+    writeFastVLine(x0, y0, y1 - y0 + 1, color);
+  } else if (y0 == y1) {
+    if (x0 > x1) {
+      _swap_int16_t(x0, x1);
+    }
+    writeFastHLine(x0, y0, x1 - x0 + 1, color);
+  } else {
+    writeLine(x0, y0, x1, y1, color);
   }
 }
 
