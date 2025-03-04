@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include "Regulator.hpp"
 #include "Display.hpp"
+#include "Button.hpp"
 
 struct Line {
   Vector2D start;
@@ -33,6 +34,7 @@ class GameHandler {
     static GameHandler* s_instance;
     Display* m_p_tft;
     Regulator* m_p_pot;
+    Button* m_p_but;
     uint8_t m_carPos;
     int8_t m_hitPoints;
     Hazard m_obstacle;
@@ -45,10 +47,11 @@ class GameHandler {
     void drawHUD(void);
     void updateHazard(unsigned long deltaTime);
     void drawHazard(void);
+    void drawGameOver(void);
     Hazard generateHazard(void);
   public:
     void run(void);
     static GameHandler& getInstance(void);
-    void init(Display* p_tft, Regulator* p_pot);
+    void init(Display* p_tft, Regulator* p_pot, Button* p_but);
     ~GameHandler();
 };

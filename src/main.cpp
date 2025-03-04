@@ -58,9 +58,9 @@ Preferences prefs;
 void setup(void) {
   pinMode(APP_BUZZ, OUTPUT);
   Serial.begin(9600);
-  tft.initR(INITR_BLACKTAB);      // Init ST7735S chip, black tab
+  tft.initR(INITR_BLACKTAB);      //Init ST7735S chip, black tab
   but.init();
-  game.init(&tft, &pot);
+  game.init(&tft, &pot, &but);
   prefs.begin("my-app");
 }
 
@@ -141,9 +141,8 @@ void drawSmiley(Mood mood) {
 
 void drawVoteMenu(void) {  
   int selected = 999; //Force the screen to always draw at the first cycle
-  bool waiting = true;
   
-  while(waiting) {
+  while(true) {
     int selectedPrevious = selected;
     selected = pot.getCurrentSection(3);
 

@@ -18,9 +18,11 @@ GameHandler::GameHandler(void) {
   m_lastDamage = 0;
 }
 
-void GameHandler::init(Display* p_tft, Regulator* p_pot) {
+void GameHandler::init(Display* p_tft, Regulator* p_pot, Button* p_but, Preferences* p_prefs) {
   m_p_tft = p_tft;
   m_p_pot = p_pot;
+  m_p_but = p_but;
+  m_p_prefs = p_prefs;
 }
 
 GameHandler& GameHandler::getInstance(void) {
@@ -47,6 +49,7 @@ void GameHandler::run(void) {
     }
     lastTime = millis();
   }
+  drawGameOver();
   /* Reset to default settings */
   m_carPos = ST7735_TFTWIDTH_128 * 0.5;
   m_obstacle = generateHazard();
@@ -143,6 +146,31 @@ void GameHandler::drawHazard(void) {
   uint16_t y4 = y0 + side_length * 0.75;
   m_p_tft->fillCircle(x0, y4, side_length * 0.05, ST77XX_BLACK);
 
+}
+
+void GameHandler::drawGameOver(void) {  
+  m_p_tft->fillScreen(ST77XX_BLACK);
+  char tmpText[12] = "Game Over";
+  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.167, ST77XX_WHITE, 2);
+  uint secondsAlive = (millis() - m_startTime) / 1000;   //For how many seconds was the game running
+  uint8_t minutes = secondsAlive / 60;
+  uint8_t seconds = secondsAlive % 60;
+  strcpy(tmpText, "Zeit:");
+  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160  * 0.334, ST77XX_WHITE, 2);
+  char score[7];      //The biggest possible score would be "255:59", so the score shouldn't be longer than 7 characters
+  snprintf(score, sizeof(score), "%d:%02d", minutes, seconds);
+  m_p_tft->drawText(score, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.5, ST77XX_WHITE, 2);
+  /* Draw the current record */
+  strcpy(tmpText, "Rekord:");
+  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160  * 0.667, ST77XX_WHITE, 2);
+  //int record;
+  //m_p_prefs->getBytes("votes", score, 1);
+  m_p_tft->drawText(score, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.834, ST77XX_WHITE, 2);
+  m_p_tft->renderBuffer();
+
+  while(!m_p_but->hasBeenPressed()) {
+    delay(5);
+  }
 }
 
 Hazard GameHandler::generateHazard(void) {
