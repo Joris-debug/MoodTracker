@@ -11,11 +11,11 @@ GameHandler::GameHandler(void) {
   m_p_tft = nullptr;
   m_p_pot = nullptr;
   m_carPos = ST7735_TFTWIDTH_128 * 0.5;
-  srand(time(NULL));
   m_obstacle = generateHazard();
   m_hitPoints = MAX_HP;
   m_startTime = 0;
   m_lastDamage = 0;
+  m_gameSpeed = 1.0;
 }
 
 void GameHandler::init(Display* p_tft, Regulator* p_pot, Button* p_but, Preferences* p_prefs) {
@@ -33,6 +33,7 @@ GameHandler& GameHandler::getInstance(void) {
 }
 
 void GameHandler::run(void) {  
+  srand(micros());
   unsigned long lastTime = m_startTime = millis();
   unsigned long deltaTime = 0;      //No movement on the first frame
   while(m_hitPoints > 0) {
@@ -42,6 +43,7 @@ void GameHandler::run(void) {
     drawCar();
     drawHUD();
     m_p_tft->renderBuffer();
+    increaseDifficulty();
     deltaTime = millis() - lastTime;  //Milliseconds that have passed since the last cycle of the game loop
     if(deltaTime < 1000 / FPS) {
       delay(1000 / FPS - deltaTime);
@@ -55,6 +57,7 @@ void GameHandler::run(void) {
   m_obstacle = generateHazard();
   m_hitPoints = MAX_HP;
   m_lastDamage = 0;
+  m_gameSpeed = 1.0;
 }
 
 void GameHandler::drawStreet(void) {  
@@ -102,19 +105,15 @@ void GameHandler::drawHUD(void) {
     m_p_tft->drawImage(heart, ST7735_TFTWIDTH_128 * 0.05, i * HEART_HEIGHT, HEART_WIDTH, HEART_HEIGHT, ST77XX_BLACK);
   }
   uint secondsAlive = (millis() - m_startTime) / 1000;   //For how many seconds is the game running
-  uint8_t minutes = secondsAlive / 60;
-  uint8_t seconds = secondsAlive % 60;
   char tmpText[] = "Deine";
   m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.845, ST7735_TFTHEIGHT_160 * 0.04, ST77XX_BLACK, 1);  
   strcpy(tmpText, "Zeit:");
   m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.865, ST7735_TFTHEIGHT_160 * 0.14, ST77XX_BLACK, 1);
-  char score[7];      //The biggest possible score would be "255:59", so the score shouldn't be longer than 7 characters
-  snprintf(score, sizeof(score), "%d:%02d", minutes, seconds);
-  m_p_tft->drawText(score, ST7735_TFTWIDTH_128 * 0.86, ST7735_TFTHEIGHT_160 * 0.24, ST77XX_BLACK, 1);
+  m_p_tft->drawText(parseTimeToText(secondsAlive), ST7735_TFTWIDTH_128 * 0.86, ST7735_TFTHEIGHT_160 * 0.24, ST77XX_BLACK, 1);
 }
 
 void GameHandler::updateHazard(unsigned long deltaTime) {
-  m_obstacle.progress += deltaTime * HAZARD_SPEED;
+  m_obstacle.progress += deltaTime * m_gameSpeed * HAZARD_SPEED;
   if(m_obstacle.progress > 1) {
     m_obstacle = generateHazard();
   }
@@ -150,27 +149,39 @@ void GameHandler::drawHazard(void) {
 
 void GameHandler::drawGameOver(void) {  
   m_p_tft->fillScreen(ST77XX_BLACK);
-  char tmpText[12] = "Game Over";
-  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.167, ST77XX_WHITE, 2);
+  char tmpText[14] = "Game Over";
+  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.117, ST77XX_WHITE, 2);
+  /* Draw the current time */
   uint secondsAlive = (millis() - m_startTime) / 1000;   //For how many seconds was the game running
-  uint8_t minutes = secondsAlive / 60;
-  uint8_t seconds = secondsAlive % 60;
   strcpy(tmpText, "Zeit:");
-  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160  * 0.334, ST77XX_WHITE, 2);
-  char score[7];      //The biggest possible score would be "255:59", so the score shouldn't be longer than 7 characters
-  snprintf(score, sizeof(score), "%d:%02d", minutes, seconds);
-  m_p_tft->drawText(score, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.5, ST77XX_WHITE, 2);
-  /* Draw the current record */
+  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160  * 0.284, ST77XX_WHITE, 2);
+  m_p_tft->drawText(parseTimeToText(secondsAlive), ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.4, ST77XX_WHITE, 2);
+  /* Draw the high score */
   strcpy(tmpText, "Rekord:");
-  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160  * 0.667, ST77XX_WHITE, 2);
-  //int record;
-  //m_p_prefs->getBytes("votes", score, 1);
-  m_p_tft->drawText(score, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.834, ST77XX_WHITE, 2);
-  m_p_tft->renderBuffer();
+  m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160  * 0.617, ST77XX_WHITE, 2);
+  uint highScore = m_p_prefs->getInt(HIGH_SCORE_KEY, 0); //Default high score is zero seconds
+  m_p_tft->drawText(parseTimeToText(highScore), ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.733, ST77XX_WHITE, 2);
 
+  if(secondsAlive > highScore) { //New high score
+    m_p_prefs->putInt(HIGH_SCORE_KEY, secondsAlive);
+    strcpy(tmpText, "Neuer Rekord,");
+    m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.88, ST77XX_WHITE, 1);
+    strcpy(tmpText, "gratulation!");
+    m_p_tft->drawText(tmpText, ST7735_TFTWIDTH_128 * 0.5, ST7735_TFTHEIGHT_160 * 0.95, ST77XX_WHITE, 1);
+  }
+  m_p_tft->renderBuffer();
   while(!m_p_but->hasBeenPressed()) {
     delay(5);
   }
+}
+
+char* GameHandler::parseTimeToText(uint totalSeconds) {
+  uint8_t minutes = totalSeconds / 60;
+  uint8_t seconds = totalSeconds % 60;
+  static char timeText[7]; //The biggest possible score would be "255:59", so the score shouldn't be longer than 7 characters
+  totalSeconds %= 15360; //Prevent overflow if the time is longer than 255 minutes and 50 seconds
+  snprintf(timeText, sizeof(timeText), "%d:%02d", minutes, seconds);
+  return timeText;
 }
 
 Hazard GameHandler::generateHazard(void) {
@@ -195,12 +206,12 @@ void GameHandler::moveCar(unsigned long deltaTime) {
   uint8_t selected = m_p_pot->getCurrentSection(3);
   switch(selected) {
     case 1:        
-      m_carPos -= deltaTime * CAR_SPEED;
+      m_carPos -= deltaTime * m_gameSpeed * CAR_SPEED;
       break;
     case 2:        
       return;
     case 3:
-      m_carPos += deltaTime * CAR_SPEED;
+      m_carPos += deltaTime * m_gameSpeed * CAR_SPEED;
       break;
   }
 
@@ -209,6 +220,19 @@ void GameHandler::moveCar(unsigned long deltaTime) {
   } else if(m_carPos > ST7735_TFTWIDTH_128 - 0.5 * CAR_WIDTH) {
     m_carPos = ST7735_TFTWIDTH_128 - 0.5 * CAR_WIDTH;
   }
+}
+
+void GameHandler::increaseDifficulty(void) {
+    //Calculate how many seconds the game has been running
+    uint secondsAlive = (millis() - m_startTime) / 1000;
+    
+    //Increase speed by 0.1 every 10 seconds
+    m_gameSpeed = 1.0 + (secondsAlive / 10.0) * 0.1;
+
+    //Ensure the game speed does not exceed MAX_GAME_SPEED
+    if (m_gameSpeed > MAX_GAME_SPEED) {
+        m_gameSpeed = MAX_GAME_SPEED;
+    }
 }
 
 GameHandler::~GameHandler() {

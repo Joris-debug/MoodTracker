@@ -1,8 +1,12 @@
 #pragma once
 #include <Arduino.h>
+#include <Preferences.h>
 #include "Regulator.hpp"
 #include "Display.hpp"
 #include "Button.hpp"
+
+#define HIGH_SCORE_KEY "highScore"
+#define MAX_GAME_SPEED 3
 
 struct Line {
   Vector2D start;
@@ -35,11 +39,13 @@ class GameHandler {
     Display* m_p_tft;
     Regulator* m_p_pot;
     Button* m_p_but;
+    Preferences* m_p_prefs;
     uint8_t m_carPos;
     int8_t m_hitPoints;
     Hazard m_obstacle;
     unsigned long m_startTime;    //Timestamp of the start of the game
     unsigned long m_lastDamage;   //Timestamp of when the last damage was taken
+    float m_gameSpeed;            //Decides how fast the game runs (Increases difficulty)
     GameHandler(void);
     void drawStreet(void);
     void moveCar(unsigned long deltaTime);
@@ -48,10 +54,12 @@ class GameHandler {
     void updateHazard(unsigned long deltaTime);
     void drawHazard(void);
     void drawGameOver(void);
+    char* parseTimeToText(uint secondsAlive);
     Hazard generateHazard(void);
+    void increaseDifficulty(void);
   public:
     void run(void);
     static GameHandler& getInstance(void);
-    void init(Display* p_tft, Regulator* p_pot, Button* p_but);
+    void init(Display* p_tft, Regulator* p_pot, Button* p_but, Preferences* p_prefs);
     ~GameHandler();
 };

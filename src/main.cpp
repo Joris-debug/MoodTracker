@@ -28,6 +28,9 @@
 #define NOTE_A5        880
 #define NOTE_B5        988
 
+#define PREFS_NAME     "my-app"
+#define VOTES_KEY      "votes"
+
 enum Mood { Happy = 1, Neutral = 2, Sad = 3 };
 
 void playSound(int note, int duration);
@@ -60,8 +63,8 @@ void setup(void) {
   Serial.begin(9600);
   tft.initR(INITR_BLACKTAB);      //Init ST7735S chip, black tab
   but.init();
-  game.init(&tft, &pot, &but);
-  prefs.begin("my-app");
+  prefs.begin(PREFS_NAME);
+  game.init(&tft, &pot, &but, &prefs);
 }
 
 void loop() {
@@ -282,7 +285,7 @@ void drawMoodAverage(void) {
 
 byte* getVotes(void) {  
   static byte votes[VOTE_MEMORY];
-  prefs.getBytes("votes", votes, VOTE_MEMORY);
+  prefs.getBytes(VOTES_KEY, votes, VOTE_MEMORY);
   return votes;
 }
 
@@ -291,7 +294,7 @@ void addVote(Mood vote) {
   for(int i = 0; i < VOTE_MEMORY; i++) {
     if(votes[i] == 0) { //The array is not full yet
       votes[i] = static_cast<byte>(vote);
-      prefs.putBytes("votes", votes, VOTE_MEMORY);
+      prefs.putBytes(VOTES_KEY, votes, VOTE_MEMORY);
       return;
     }
   }
@@ -300,7 +303,7 @@ void addVote(Mood vote) {
     newVotes[i - 1] = votes[i];
   }
   newVotes[VOTE_MEMORY - 1] = static_cast<byte>(vote);
-  prefs.putBytes("votes", newVotes, VOTE_MEMORY);
+  prefs.putBytes(VOTES_KEY, newVotes, VOTE_MEMORY);
 }
 
 void waitForAction(void) {
